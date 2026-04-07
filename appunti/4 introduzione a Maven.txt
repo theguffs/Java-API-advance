@@ -1,0 +1,66 @@
+
+SEZIONE 4:  Maven YOUSSEF
+
+
+Un JAR (Java ARchive) è in pratica uno zip con dentro classi compilate, metadati
+e a volte risorse: è il modo standard di distribuire una libreria o un’app Java.
+Se non ho un tool che me lo gestisce, finisco con cartelle piene di jaar con
+versioni diverse e nessuno sa più cosa è aggiornato — qui entra in gioco Maven.
+
+Maven è un tool di build e di gestione dipendenze: non scrivo il programma al
+posto mio, ma mi evita di scaricare a mano ogni libreria e mi dà comandi fissi
+(compilare, testare, impacchettare). Il cuore del progetto Maven è il file
+pom.xml nella cartella radice; senza quello Maven non sa dove guardare.
+
+Creo un progetto Spring Boot con Maven come fa il corso: Spring Initializr genera
+già pom + struttura standard; in Eclipse lo importo come Existing Maven Project.
+Nel pom trovo il parent spring-boot-starter-parent che allinea un sacco di
+versioni senza che io le elenchi una per una.
+
+    <!-- io: coordinate = identità del progetto su Maven -->
+    <groupId>com.example</groupId>
+    <artifactId>mia-app</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+Project Object Model (POM) = tutto ciò che Maven sa sul progetto: nome, packaging
+(jar/war), proprietà, dipendenze, plugin, repo. Se sbaglio una dipendenza o una
+versione, il build mi dice cosa non torna invece di esplodere in silenzio a runtime.
+
+Dependency management: nel pom dichiaro cosa mi serve (groupId, artifactId,
+versione a volte omessa se la gestisce il parent). Maven risolve anche le
+dipendenze transitive — cioè le dipendenze delle mie dipendenze — e le mette nel
+classpth. Comando utile quando il mondo brucia: mvn dependency:tree per vedere
+l’albero e capire chi tira dentro cosa.
+
+Repositories: la Maven Central (e altri repo remoti) sono dove stanno gli artifact;
+sul mio PC c’è la repository locale (.m2) dove Maven mette in cache ciò che ha
+scaricato, così non riscarica tutto ogni volta. mvn install pubblica il mio jar
+nella locale per altri moduli o progetti sullo stesso computer.
+
+Convention over configuration: non devo inventare cartelle a caso. Le sorgenti
+stanno in src/main/java, le risorse in src/main/resources, i test in
+src/test/java; l’output finisce in target. Se rispetto le convenzioni, Maven sa
+già cosa compilare senza mille righe di config.
+
+Build lifecycle: non è un comando random, è una seguenza di fasi (validate,
+compile, test, package, install, deploy…). Io uso spesso mvn clean install per
+ripartire pulito e avere il pacchetto pronto; mvn package solo per fare il jar
+dopo i test. I plugin (compiler, surefire, spring-boot-maven-plugin…) si agganciano
+alle fasi e fanno il lavoro sporco.
+
+Maven + Spring Boot: il pom elenca gli starter; Maven scarica le librerie, Boot
+le usa per auto-configurare. È la coppia che userò per tutto il corso REST/SOAP.
+
+Versioning e semantic versioning (major.minor.patch): cambio “major” quando rompo
+compatibilità, “minor” per funzioni nuove compatibili, “patch” per fix. SNAPSHOT
+in development = versione non ancora “ufficiale” su repo release. Mi segno di
+non mischiare versioni a caso nello stesso progetto senza capire perchè.
+
+In chiusura: JAR = formato; Maven = ordine + build; POM = cervello; repo locale
+e central = da dove prendo le librerie; convenzioni = meno configurazione;
+lifecycle = ordine dei comandi; Boot e Maven lavorano insieme; versioni con
+criterio.
+
+Nota da tastiera: se il pom non compila controllo prima parent, java version e
+che non ho typo negli artifactId — mi è capitato di scrivere spring-boot-starter-wbe
+e poi chiedermi perchè il web non partiva.

@@ -1,0 +1,79 @@
+
+RIASSUNTO – SEZIONE 3: Introduction to Spring Boot in 10 Steps YOUSSEF
+
+
+Spring Boot non è un altro mondo paralleo: è il modo “veloce” di usare Spring
+senza impazzire con mille XML e setup manuale. Prima di Boot c’era più fatica:
+configurare a mano server, dipendenze sparse, file lunghi; Boot mette convenzioni
+e starter che ti fanno partire in pochi mintui.
+
+Si parte da Spring Initializrr: stesso discorso della sezione Spring ma con
+dipendenze tipo spring-boot-starter-web, si genera il progetto, import Maven in
+Eclipse. La prima cosa utile è un Hello World come API REST: una classe con
+@SpringBootApplication, un @RestController con @GetMapping e torni una stringa
+o un messaggio JSON — così vedi subito Tomcat embedded che parte da solo.
+
+    @SpringBootApplication
+    public class MioCorsoApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(MioCorsoApplication.class, args);
+            // io: lancio e basta, niente configurare server a mano
+        }
+    }
+
+    @RestController
+    public class HelloController {
+        @GetMapping("/hello")
+        public String ciao() {
+            return "Hello World"; // classico, ma funziona
+        }
+    }
+
+Obiettivo di Boot in due parole: opinionated defaults + meno configurazione
+ripetitiva. La “magia” non è occultismo: gli starter (es. starter-web) sono
+pacchetti di dipendenze già pensate per un caso d’uso; l’auto-configuration
+guarda cosa hai nel classpath e configura bean sensati se non gli dici il
+contrario (tipo DispatcherServlet, Jackson, ecc. quando hai starter-web).
+
+Spring Boot DevTools in sviluppo: ricarica più comoda, restart più rapido quando
+tocchi codice (live reload / restart — dipende da come lo imposti nel corso),
+insomma meno tempo a spegnere e riaccendere tutto a mano.
+
+Parte “production ready”: i profili (@Profile o spring.profiles.active) servono
+per avere configurazioni diversi per ambiente (dev vs prod) senza mescolare tutto
+in un file solo; io metto application-dev.properties e application-prod.properties
+e attivo quello che mi serve.
+
+    # application.properties
+    spring.profiles.active=dev
+
+    # application-dev.properties
+    logging.level.org.springframework=debug   # quando voglio vedere casino nei log
+
+@ConfigurationProperties lega proprietà del file a un bean tipizzato invece di
+spargere @Value ovunque: più ordine quando hai tante chiavi (prefix, campi Java,
+validazione opzionale).
+
+Embedded server: non installo Tomcat a parte per iniziare; è dentro il jar/war
+che lanci con java -jar o da IDE. Actuator aggiunge endpoint per monitorare
+l’app (health, info, metriche a seconda di cosa abiliti): in produzione conviene
+chiudere bene la sicurezza su quelle URL, non lasciare tutto aperto “perchè sì”.
+
+    <!-- nel pom, roba tipo (versione = quella del corso) -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+Differenza rapida che mi tengo: Spring Framework = nucleo e moduli; Spring MVC
+= web MVC / REST sul modello Spring; Spring Boot = convenzioni + auto-config +
+starter + embedded server per partire forte. Boot usa sotto MVC e il core, non
+li sostituisce.
+
+Ultima lezione sul restare aggiornati: release Java/Spring cambiano, conviene
+seguire note di versione del corso e changelog ufficiali, non fidarsi solo di
+tutorial vecchi di cinque anni.
+
+Nota da quaderno: le dipendenze viene tirate giù da Maven come prima, Boot
+solo le raggruppa in modo furbo; se qualcosa non parte, guardo classpath e log
+prima di incolpare il PC.

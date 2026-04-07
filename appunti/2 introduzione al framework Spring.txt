@@ -1,0 +1,94 @@
+APPUNTI SEZIONE 2 DI YOUSSEF
+
+L’idea generale è capire perché Spring esiste: gestire dipendenze e togliere
+un po’ di new sparsi, lasciando che un contenitore crei e colleghi gli ogetti.
+Quando qualcosa va in errore, il consiglio pratico del corso è leggere bene lo
+stack trasce e confrontare con repo / lezione invece di improvvisare.
+
+Il progetto si crea con Spring Initializr (start.spring.io): Maven, Java,
+starter base, zip, import come Maven Project in Eclpise. Nel pom c’è il parent
+Spring Boot che allinea le versioni; io controllo sempre che la versione sia
+quella del video, non copincollo alla cieca.
+
+    <!-- Spring Boot mi tira su le versioni allineate -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>...versione del corso...</version>
+    </parent>
+
+Partono da un esempio videogioco. Prima versione “sporca”: GameRunner incollato
+a MarioGame; se cambio gioco devo rompere GameRunner. È il tight coupling:
+due classi troppo legate, un cambio ne tira un altro.
+
+    public class GameRunner {
+        private MarioGame game; // sono sposato con Mario, male
+        public GameRunner() {
+            game = new MarioGame();
+        }
+        public void run() {
+            game.up();
+            game.down();
+        }
+    }
+
+Seconda mossa: interfaccia GamingConsole e GameRunner che dipende dal contratto,
+non dal concreto. Aggiungo PacmanGame (stessa interfaccia): il runner resta
+uguale, cambio solo cosa gli passo. Nel main decido ancora io con i new.
+
+    public interface GamingConsole {
+        void up(); void down(); void left(); void right();
+    }
+
+    public class GameRunner {
+        private GamingConsole game;
+        public GameRunner(GamingConsole game) {
+            this.game = game;
+        }
+    }
+
+    // nel main: ancora io che scelgo il gioco
+    GamingConsole g = new PacmanGame();
+    GameRunner runner = new GameRunner(g);
+    runner.run();
+
+Tersa mossa: Spring fa da fabbrica. Metto @Component sulle classi che voglio
+nel contesto, avvio con SpringApplication.run: component scan, bean registrati,
+dipendenze risolte. Dependency injection = Spring mi passa l’implementazione
+giusta (costruttore / @Autowired a seconda degli esempi). Bean = oggetto
+gestito dal container; IoC = non sono io a fare tutti i new ovunque;
+Application Context = dove vivono i bean a runtime. Con log in debug si vede
+cosa crea e in che ordine.
+
+    @Component
+    public class GameRunner {
+        private GamingConsole game;
+        public GameRunner(GamingConsole game) {
+            this.game = game; // Spring inietta chi tocca
+        }
+    }
+
+    @Component
+    public class MarioGame implements GamingConsole { /* ... */ }
+
+Se ho più giochi tutti @Component sullo stesso tipo, Spring va in confusione
+(“2 beans found”): si usa @Primary su quello predefinito o @Qualifier per
+scegliere esplicitamente (es. Super Contra).
+
+    @Component
+    @Primary
+    public class SuperContraGame implements GamingConsole { /* ... */ }
+
+Perché Spring “vale la pena”: meno cablaggio manuale, test più semplici con
+mock sulle interfacce, configurazione più centralizzata. Se il design è
+sbagliato, però, il framework non sistema la testa.
+
+Maven resta sotto: mvn clean install, mvn package, dipendenze scaricate in repo localee, classpath popolato senza scaricare jar a mano.
+
+Sui tipi di injection il corso passa in rassegna costruttore (quello che
+preferisco io: dipendenze chiare), setter e field; Framework è modulare (Core,
+Web, Data, AOP…), mentre Spring Boot / Cloud / Data sono progetti che aggiungono
+convenzioni e meno configurazione verbosa. Chiusura mentale: da accoppiamento
+stretto → interfaccia → container Spring + DI → occhio ai multi-bean → Maven
+dietro le quinte. La parte “About your instructor” è solo presentazione del
+formatore e del materiale, non tecnica.

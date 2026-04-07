@@ -1,0 +1,27 @@
+introduzione corso java avanzato YOUSSEF
+
+Un web service è un modo per far comunicare due aplicazioni via rete (scambio
+machine-to-machiine), non una pagina web per l’utente: un client invia richisete
+e un server risponde, di solito con HTTP e messaggi in un formato condiviso.
+
+
+
+
+Il servizio è esposto secondo un contratto (cosa si può chiedere e in che forma
+si riceve la risposta). Se si usano standard aperti (HTTP, XML o JSON, regole
+comuni), il sistema diventa indipendente di linguaggio e piattaforma: non serve che entrambi le parti usino lo stesso ambinte.
+
+
+
+
+Termini da ricordare: provider (chi offre il servizio), consumer/client (chi lo
+usa), contract (regole e messaggi; in SOAP spesso WSDL, in REST spesso Swgger
+con HTTP), message (richiesta/risposta), endpoint (indirizzo dove si raggiunge
+il servizio).
+
+
+
+SOAP si basa su messaggi XML strutturati e contratti formali, tipico di contesti
+enterprise. REST sfrutta HTTP (verbi come GET/POST/PUT/DELETE), risorse
+identificate da URL e spesso JSON; è molto usato per API moderne. Il corso
+affronta entrambi perché in aziemda si incontrano ancora entrambi gli stili.
