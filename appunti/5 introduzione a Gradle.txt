@@ -1,0 +1,92 @@
+APPUNTI SEZIONE 5 DI YOUSSEF
+
+Gradle, in soldoni, è un tool che mi aiuta a costruire il progetto Java senza
+fare a mano ogni passaggio noioso. Come Maven si occupa di build e dipendenze,
+ma è più flessibile perchè si basa su script (`build.gradle` o `build.gradle.kts`)
+e non su XML puro. Quindi l'idea è: stessi obiettivi finali, ma più libertà su
+come organizzo il flusso.
+
+Nel corso la parte interessante è vedere che creare un progetto Spring Boot con
+Gradle non cambia la logica dell'applicazione: cambiano soprattutto i file di
+build. Da Spring Initializr seleziono Gradle e mi ritrovo la solita struttura
+ordinata (`src/main/java`, `src/test/java`, risorse...). Da lì posso usare i
+comandi Gradle normalmente:
+
+    gradle build
+    gradle test
+    gradle bootRun
+
+`bootRun` è comodissimo quando sviluppo, perchè avvio subito l'app senza fare
+tanti giri. Le dipendenze (starter web, starter test, ecc.) continuano a essere
+gestite in automatico, solo che le scrivo in modo diverso rispetto al `pom.xml`.
+
+Due file sono davvero centrali. `settings.gradle` serve a dare identità al
+progetto e, se ho più moduli, a dire quali includere. `build.gradle` invece è
+il cuore operativo: plugin, dipendenze, repository e configurazioni del buildd.
+Un esempio minimale è questo:
+
+    plugins {
+        id 'java'
+        id 'org.springframework.boot' version '3.x.x'
+        id 'io.spring.dependency-management' version '1.x.x'
+    }
+
+    group = 'com.example'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+Qui c'è già il necessario per partire: chi sono (`group`/`version`), dove prendo
+le librerie (`mavenCentral`) e cosa mi serve per run e test.
+
+Poi ci sono i plugin, che in pratica aggiungono funzionalità pronte. Il plugin
+`java` mi dà task classici come `test` e `jar`, quello Spring Boot aggiunge
+`bootRun` e `bootJar`, e il dependency-management aiuta a tenere allineate le
+versioni. In questo senso è simile alla filosofia Boot: meno configurazione
+ripetitiva e più tempo sul codice vero.
+
+Altro concetto base: i task. Un task è un pezzo di lavoro eseguibile, tipo
+compilare o testare. Posso anche farmene uno mio:
+
+    tasks.register('helloGradle') {
+        doLast {
+            println 'Ciao dal task custom!'
+        }
+    }
+
+e poi lanciarlo con:
+
+    gradle helloGradle
+
+La cosa bella è che Gradle usa un grafo di task e prova a evitare lavoro inutile
+(incremental build + caching). Se non ho toccato niente, spesso non ricompila
+tutto da zero e quindi è più rapido.
+
+Sul confronto Maven vs Gradle io me la segno così: Maven è super standard,
+molto prevedibile e spesso ottimo nei team grandi dove la rigidità aiuta.
+Gradle invece è più scriptabile e comodo quando il build diventa articolato o
+quando voglio ottimizzare tempi su run ripetuti. Non c'è un "giusto assoluto":
+la scelta dipende da contesto, team e progetto.
+
+Regola pratica che mi porto via dal corso: se il team usa già Maven e funziona,
+non cambio per moda. Se parto da zero e voglio più flessibilità, Gradle è una
+scelta fortee. In Spring Boot comunque entrambi sono supportati benissimo.
+
+Mini mappa mentale finale:
+Gradle = motore di build scriptabile
+`settings.gradle` = identità/struttura progetto
+`build.gradle` = plugin + dipendenze + task
+Plugin = capacità extra già pronte
+Task = unità di lavoro eseguibile
+Maven vs Gradle = scelta tecnica, non guerra di religione
+
+quando qualcosa non va nel build, controllo subito repository,
+errori di scrittura nelle dipendenze e versione Java. Nella pratica il problema
+è lì più spesso di quanto sembra, non nel codice business.
