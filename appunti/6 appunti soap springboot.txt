@@ -1,0 +1,69 @@
+
+soap con spring boot
+
+da quello che ho capito soap e molto piu rigido di rest.
+si basa su xml e su un contratto fatto bene (wsdl + xsd), quindi il client sa gia in modo preciso cosa mandare e cosa ricevere.
+e un po noioso all inizio pero nei progetti grossi ha senso.
+
+la parte chiave e partire dal contratto, non dal codice java.
+prima penso a request/response in xml, poi scrivo xsd, poi genero classi java e solo dopo faccio endpoint.
+se parto dal java rischio casino dopo.
+
+per la richiesta base del corso c'e una request con id, e la response con i dettagli corso.
+tipo id, nome, descrizione ecc.
+
+con xsd definisco bene i tipi e la struttura.
+qui devo stare attento ai namespace perche se sbaglio una riga poi non matcha nulla e sembra tutto rotto.
+
+cose utili per xsd:
+- dare nomi decenti ai type/element
+- non copiare 20 volte lo stesso blocco
+- usare campi opzionali dove serve
+- pensare gia un minimo a possibili cambi futuri
+
+quando modifico lo xsd devo rigenerare i file java da jaxb.
+questa cosa me la dimentico sempre e poi perdo 15 min a capire perche non funziona lol.
+
+jaxb cmq utile, fa lui conversione xml <-> oggetti java.
+meno sbatti a scrivere classi a mano.
+
+endpoint soap in spring:
+classe con @Endpoint, metodo mappato con @PayloadRoot usando namespace + localPart.
+prende la request e torna la response.
+all inizio anche response fake va bene, poi collego il service vero.
+
+config:
+va registrato message dispatcher servlet (di solito /ws/*).
+poi bean per generare wsdl con schema xsd, namespace, uri ecc.
+alla fine hai l url del wsdl pronto.
+
+per provare le chiamate si puo usare wizdler.
+se non va, soapui comunque salva la vita.
+
+backend iniziale fatto in memoria (lista o mappa corsi), cosi testo tutto senza db.
+struttura tipica endpoint -> service -> dati.
+
+poi si aggiunge la chiamata per prendere tutti i corsi.
+in xsd nella response metto lista (maxOccurs multiplo), abbastanza lineare.
+
+ripasso wsdl al volo:
+types = schema xsd
+message = input output
+portType = operazioni disponibili
+binding = come passano i messaggi
+service = endpoint reale
+
+per delete:
+request con id corso, response con stato.
+meglio enum per stato invece di stringhe random (success/fail ecc), almeno evito typo stupidi.
+
+error handling:
+eccezioni business vanno trasformate in soap fault fatto bene.
+non devo buttare exception grezze al client senno e ingestibile.
+
+sicurezza:
+ws-security per username token, firma, cifratura.
+parte un po delicata, occhio alle versioni librerie security perche li si rompe facile.
+
+in sintesi: piu verboso di rest ma molto piu controllato.
+se tengo pulito contratto + endpoint + gestione errori + security viene fuori una cosa fatta bene.
