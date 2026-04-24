@@ -1,0 +1,63 @@
+
+jpa e hibernate - appunti
+
+qui il senso era capire il passaggio da sql "manuale" a gestione dati piu furba con orm.
+all inizio si chiarisce bene obiettivo: lavorare su database con meno boilerplate possibile e codice piu pulito.
+
+progetto spring boot nuovo con dipendenze per jpa/h2.
+h2 utile per test veloci in locale senza installare db esterno.
+
+attivando h2 console riesco a vedere tabelle e dati al volo dal browser.
+comodo per controllare se insert/delete/query stanno funzionando davvero.
+si crea tabella course e si fanno prime prove.
+
+prima parte con spring jdbc:
+approccio piu vicino a sql puro.
+devi scrivere query a mano ma capisci benissimo cosa succede dietro.
+
+si parte inserendo dati hardcoded per fare smoke test.
+poi aggiungi delete e altre operazioni base.
+qui si prende confidenza con update(...) e parametri query.
+
+poi parte il pezzo query:
+select by id, select all ecc.
+devi mappare risultato in oggetto java (row mapper), un po verboso ma chiaro.
+
+dopo questo switch a jpa con entitymanager.
+qui cambia mentalita:
+non ragioni piu solo in sql, ragioni in termini di entity java.
+
+crei entity course con annotazioni tipo @Entity, @Id ecc.
+entitymanager gestisce persist/find/remove e semplifica parecchio.
+
+la "magia" jpa e proprio questa:
+tu lavori a oggetti e lui traduce in query.
+ovviamente non e magia vera, sotto fa sql, pero per sviluppo quotidiano aiuta.
+
+poi entra spring data jpa:
+ancora meno codice.
+definisci repository interface e tante query comuni arrivano gia pronte.
+crud base quasi gratis.
+
+cose fighe spring data jpa:
+- metodi derivati dal nome (es findByName)
+- sorting e pagination comodi
+- integrazione pulita con jpa/hibernate
+
+quindi in pratica:
+spring jdbc = controllo alto ma piu lavoro manuale
+jpa/entitymanager = buon compromesso
+spring data jpa = produttivita alta e meno boilerplate
+
+differenza hibernate vs jpa (importante):
+jpa e una specifica (standard), hibernate e una implementazione concreta.
+quindi jpa dice "come dovrebbe funzionare", hibernate dice "ok lo faccio io cosi".
+
+in parole povere:
+- jpa = contratto/api
+- hibernate = motore orm vero e proprio
+
+morale personale:
+fare prima jdbc e utile per capire base sql.
+pero in progetti reali andare con jpa/spring data jpa fa risparmiare un sacco di tempo.
+devo solo stare attento a non fidarmi troppo della "magia" e controllare sempre query/performance quando serve.
