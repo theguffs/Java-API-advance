@@ -1,0 +1,78 @@
+
+rest con spring boot
+
+qui il focus e costruire api rest fatte bene, partendo dalle basi e poi aggiungendo pezzi man mano.
+all inizio si crea il progetto spring boot normale, e poi prima endpoint hello world giusto per vedere che risponde.
+
+prima risposta super semplice (stringa), poi meglio restituire un bean/json cosi e piu realistico.
+si usa anche path variable per personalizzare la risposta (tipo /hello-world/{name}).
+
+cosa importante che spiegava bene:
+spring boot fa una marea di roba in automatico con starter e autoconfigurazione.
+quindi molte config non le tocchi, ma devi capire almeno a grandi linee cosa succede sotto.
+
+poi si passa a una mini app social media e si progetta la risorsa user.
+si crea user bean e un dao service in memoria (lista utenti), cosi si testa senza db.
+
+metodi base:
+- get tutti gli utenti
+- get utente per id
+- post per creare utente
+- delete utente
+
+per la post non basta salvare e basta.
+va ritornato status corretto (201 created) + header location con url della risorsa nuova.
+questa e una cosa da colloquio praticamente, da ricordare bene.
+
+gestione errori:
+se id non esiste -> 404 not found.
+poi conviene avere handler generico per le altre eccezioni, in modo uniforme.
+se non lo fai ogni endpoint risponde in modo diverso e viene brutto.
+
+validazioni:
+mettere vincoli sui campi (es nome non vuoto, data nascita valida ecc) con validation annotations.
+cosi blocchi richieste sbagliate prima che entrino nella logica.
+
+poi parte la sezione funzionalita avanzate rest.
+openapi/swagger: serve per documentazione automatica api.
+aggiungi dipendenza springdoc e poi hai endpoint doc ui molto comodo per test veloci.
+
+content negotiation:
+di default json, ma si puo supportare anche xml.
+in base ad accept header il server decide il formato.
+utile quando hai client legacy.
+
+internationalization:
+messaggi localizzati in base alla lingua richiesta (accept-language).
+quindi stesso endpoint, messaggio diverso per en/it/fr ecc.
+
+versioning api:
+si possono fare vari approcci:
+- versione nell uri (/v1, /v2)
+- versione in query param
+- versione in header custom
+- versione in accept/content negotiation
+
+non c'e una regola assoluta, ognuno ha pro/contro.
+l idea e mantenere backward compatibility quando cambi payload.
+
+hateoas:
+oltre ai dati ritorni anche link utili (self, all-users, ecc), quindi api piu esplorabile.
+all inizio sembra extra inutile, poi in certi contesti aiuta parecchio.
+
+filtering:
+- statico: nascondi campi fissi sempre
+- dinamico: scegli runtime cosa mostrare
+utile per non esporre info sensibili o campi inutili.
+
+monitoraggio:
+spring boot actuator espone health, metrics, info ecc.
+fondamentale in produzione per capire se api sta bene o no.
+
+esplorazione api:
+con hal explorer puoi navigare risorse/link in modo piu visuale.
+comodo quando inizi con hateoas e vuoi vedere subito come si muove tutto.
+
+in generale questo blocco e molto pratico:
+si parte da hello world e arrivi a una api quasi production-like con error handling, docs, versioning, i18n e monitoring.
+devo solo rifare gli esempi 2-3 volte per fissare bene status code e naming dei path perche li faccio ancora confusione.
