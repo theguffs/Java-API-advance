@@ -1,0 +1,86 @@
+APPUNTI SEZIONE EXTRA DI YOUSSEF
+
+Questa parte è tipo "chiusura intelligente" del corso: meno implementazione lunga
+e più concetti che ti fanno fare salto di qualità quando scrivi API davvero usate.
+Dentro ci metto 3 blocchi: REST best practices, review Java nuove feature e mini
+appendix su functional programming.
+
+RESTful Web Services - best practices
+
+La prima cosa è non confondere "funziona" con "fatto bene". Una REST API può
+rispondere 200 a tutto e sembrare ok, ma in realtà essere difficile da usare o
+mantenere. Le best practice servono proprio a rendere l'API prevedibile.
+
+Richardson Maturity Model (molto da colloquio):
+- Level 0: uso HTTP come tunnel (una sola endpoint, tutto mischiato)
+- Level 1: risorse separate (`/users`, `/posts`)
+- Level 2: uso corretto verbi HTTP + status code
+- Level 3: HATEOAS (link utili nella risposta)
+
+Non è che "se non sei al livello 3 sei bocciato", però come linea guida è utile:
+almeno Level 2 in progetti seri dovrei averlo quasi sempre.
+
+Best practice pratiche che mi porto dietro:
+- naming pulito delle URL (nomi al plurale, niente verbi inutili)
+- status code coerenti (200, 201, 204, 400, 404, 409, 500...)
+- error response uniforme (stessa struttura per tutti gli errori)
+- validazione input lato API prima della business logic
+- versioning quando rompo compatibilità
+- documentazione API sempre aggiornata (OpenAPI/Swagger)
+- sicurezza non aggiunta "alla fine se avanza tempo"
+
+In breve: una buona REST API deve essere chiara per il client e no solo comoda
+per chi l'ha scritta.
+
+APPENDIX - Java New Features (quick review)
+
+Qui il senso non è imparare tutto a memoria, ma capire come Java si sta evolvendo.
+Negli anni hanno puntato tanto su:
+- codice più espressivo e leggibile
+- produttività sviluppatore
+- performance e gestione memoria migliorate
+- supporto cloud/container sempre più solido
+
+Feature importanti da ricordare (panoramica):
+- var (inferenza tipo locale)
+- switch expressions moderne
+- text blocks
+- records (meno boilerplate per dto/value object)
+- pattern matching (instanceof/switch moderni)
+- miglioramenti JVM e garbage collector
+
+Concetto chiave: conoscere almeno ad alto livello queste feature aiuta sia nei
+progetti nuovi sia quando leggi codice di altri team. Non devo usarle "per moda",
+ma quando migliorano davvero chiarezza/manutenibilità.
+
+APPENDIX - Introduction to Functional Programming in Java
+
+Questo blocco è bello perchè ti allena a ragionare in modo più dichiarativo.
+Parti da codice classico imperativo e piano piano lo trasformi con stream, lambda,
+filter/map, optional ecc.
+
+Percorso mentale tipico:
+1) versione base con for e if
+2) filtro dati in modo più pulito
+3) lambda per evitare classi anonime verbose
+4) map/filter/reduce con stream
+5) optional per gestire assenze senza null-check infiniti
+
+Esempio ultra semplice:
+
+    List<Integer> pari = numeri.stream()
+        .filter(n -> n % 2 == 0)
+        .map(n -> n * n)
+        .toList();
+
+Non è solo "sintassi carina": il vantaggio vero è rendere il codice più leggibile
+quando fai trasformazioni dati. Però senza esagerare: se una stream diventa troppo
+contorta, meglio tornare a una soluzione più diretta.
+
+Takeaway personale di questa sezione extra:
+- REST best practices = qualità esterna della tua API
+- Java new features = stare aggiornato e scrivere meglio
+- Functional style = pensare meglio le trasformazioni dati
+
+Nota da quaderno finale: questa sezione sembra teorica ma in realtà è quella che
+ti fa sembrare "junior solido" invece di uno che copia endpoint da tutorial.

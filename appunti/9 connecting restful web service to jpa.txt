@@ -1,0 +1,65 @@
+APPUNTI SEZIONE 9 DI YOUSSEF
+
+Questa parte del corso collega la REST API della social media app a un database
+vero (prima H2, poi MySQL opzionale) usando JPA/Hibernate, e alla fine aggiunge
+anche sicurezza base con Spring Security.
+
+La prima idea importante è il passaggio da "dati in memoria" a persistenza reale.
+Con H2 faccio test veloci in locale senza installare nulla, quindi è perfetto
+per imparare. Spring Boot con starter JPA + H2 mi crea un ambiente super rapido
+per partire e vedere subito tabelle/dati.
+
+Si crea l'entity `User` con annotazioni JPA (`@Entity`, `@Id`, ecc.) e si
+inseriscono alcuni dati test. Da lì i vecchi endpoint REST non pescano più dalla
+lista in memoria, ma dal repository JPA. La differenza pratica è enorme: i dati
+restano nel DB e posso queryare in modo strutturato.
+
+Il pezzo successivo è collegare bene tutta la REST API a JPA/Hibernate, quindi
+rifare operazioni tipo get/post/delete utenti usando repository e non più DAO
+finto. Hibernate sotto fa il lavoro ORM (entity <-> tabelle), mentre JPA è
+l'interfaccia standard che io uso nel codice.
+
+Poi arriva la relazione tra entità: `Post` collegato a `User` con many-to-one.
+Tradotto: un utente può avere tanti post, ogni post appartiene a un solo utente.
+Qui bisogna stare attenti a mapping e serializzazione JSON, perchè se sbaglio le
+relazioni rischio loop o payload strani nelle risposte.
+
+A quel punto si implementano due API molto classiche:
+- GET di tutti i post di uno user
+- POST per creare un nuovo post per uno user specifico
+
+Nel POST il flusso corretto è: trovo l'utente, associo il post a quell'utente,
+salvo e restituisco risposta sensata (idealmente con status/Location come già
+fatto per le create). Se l'utente non esiste, torno errore coerente (404).
+
+C'è anche una parte utile sulle query JPA/Hibernate: non solo CRUD base, ma come
+ragionare sulle query generate e sulle opzioni disponibili per REST API un po'
+più serie. Qui il consiglio pratico è sempre guardare SQL/log quando qualcosa è
+lento o non torna, perchè la "magia ORM" aiuta ma non va presa alla ciecca.
+
+Poi overview sul passaggio da H2 a MySQL: in sostanza cambiano datasource,
+driver e configurazioni, mentre modello/entity/repository restano quasi uguali.
+H2 va benissimo in sviluppo rapido, MySQL è più realistico per ambienti veri.
+
+C'è anche parte opzionale con Docker (installazione) per avere DB più comodo da
+gestire localmente e più vicino a setup reali del team. Non obbligatorio per
+capire i concetti, ma utile se voglio ambiente ripetibile.
+
+Nota update del corso: attenzione al connettore MySQL (versioni/nome dipendenza),
+perchè in base alle versioni Spring Boot alcune configurazioni cambiano e se
+copio roba vecchia perdo tempo su errori stupidi di connessione.
+
+Ultimo blocco: sicurezza. Si introduce Basic Authentication con Spring Security.
+All'inizio metto protezione base agli endpoint e provo con user/password.
+Subito dopo si migliora la config per avere comportamento più corretto per API
+REST (es. gestione richieste autenticate, configurazione meno "default a caso",
+e setup più pulito).
+
+In pratica il percorso è:
+REST in memoria -> REST su H2 con JPA/Hibernate -> relazioni user/post ->
+query più realistiche -> (opzionale) MySQL -> Basic Auth con Spring Security.
+
+Takeaway personale:
+JPA/Hibernate mi fanno salire di livello perchè passo da demo finta a backend
+più reale. Il punto è non limitarsi a "funziona": devo capire mapping, query,
+relazioni e sicurezza base, altrimenti appena cresce il progetto mi incasino.
